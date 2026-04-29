@@ -72,6 +72,42 @@ Useful interpretation:
 - If both exist but only one appears in the UI, suspect skill discovery, cache, duplicate filtering, or UI list state.
 - If `imagegen-local` is missing too, investigate local filesystem cleanup, accidental deletion, or a broader `~/.codex/skills` issue.
 
+## 2026-04-30 Reproduction Notes
+
+The disappearance was reproduced again on 2026-04-30 while working from:
+
+```text
+/Users/robiny/3dtankdemo
+```
+
+Observed state:
+
+- `/Users/robiny/.codex/skills/.system` no longer existed.
+- `/Users/robiny/.codex/skills/imagegen-local` still existed and remained clean against `origin/main`.
+- The active Codex skill list exposed `imagegen-local`, but did not expose the bundled `imagegen` skill.
+- Desktop logs for 2026-04-29 showed `image_generation` in the enabled feature list, so the built-in image-generation capability flag was still present.
+- Desktop startup logs repeatedly synchronized bundled plugins, but the bundled marketplace only listed `browser-use`, `computer-use`, and `latex-tectonic`.
+- A log line showed `installed system asset path="/Users/robiny/.codex/skills/chronicle/SKILL.md"`, but no comparable `imagegen` system asset install line was found.
+- Searches across `~/.codex/log/codex-tui.log` and `~/Library/Logs/com.openai.codex` found no explicit `imagegen` deletion/removal event.
+
+Current assessment:
+
+- This is more likely a Codex Desktop/runtime bundled system-asset injection or marketplace composition bug than a user-level skill bug.
+- The absence of an explicit delete log means the exact remover is still unproven.
+- The strongest hypothesis is that `.system` skills are ephemeral/generated assets, and the current runtime did not repopulate `imagegen` after a cache/app restart because `imagegen` was missing from the active bundled asset source.
+- Keeping `imagegen-local` is still the correct mitigation: it survives this failure mode and avoids same-name collisions with a future restored bundled `imagegen`.
+
+Suggested evidence commands for the next recurrence:
+
+```bash
+ls -la /Users/robiny/.codex/skills/.system
+ls -la /Users/robiny/.codex/skills/imagegen-local
+rg -n -i "imagegen|image gen|image_gen|installed system asset|skills/list|bundled_plugins" \
+  /Users/robiny/.codex/log/codex-tui.log \
+  /Users/robiny/Library/Logs/com.openai.codex
+find /Users/robiny/.codex/.tmp/bundled-marketplaces -maxdepth 6 -type f -print | sort
+```
+
 ## Maintenance Notes
 
 When the bundled system `imagegen` skill is updated upstream and appears stable, this local copy can be refreshed manually by copying from `.system/imagegen` again, preserving the `imagegen-local` name and local helper paths.
