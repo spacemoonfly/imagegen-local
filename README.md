@@ -1,5 +1,7 @@
 # imagegen-local
 
+![imagegen-local README hero](assets/readme-hero.png)
+
 `imagegen-local` is a user-scoped pinned copy of the Codex Image Gen skill.
 It is intended as a stable fallback when the bundled Codex system skill at
 `~/.codex/skills/.system/imagegen` is unavailable, temporarily missing from the
