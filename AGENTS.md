@@ -100,6 +100,22 @@ Current assessment:
 - A secondary hypothesis is that the current bundled asset source no longer includes `imagegen`, so after `.system` disappeared the runtime could not repopulate it.
 - Keeping `imagegen-local` is still the correct mitigation: it survives this failure mode and avoids same-name collisions with a future restored bundled `imagegen`.
 
+Follow-up restart check:
+
+- Before restarting Codex App, `/Users/robiny/.codex/skills/.system` was already missing.
+- After restarting Codex App, `/Users/robiny/.codex/skills/.system` was still missing.
+- `imagegen-local` stayed present and clean against `origin/main`.
+- New Desktop logs around `2026-04-29T16:26:15Z` and `2026-04-29T16:27:12Z` still showed `image_generation` in the enabled feature list.
+- The same restart logs wrote the bundled marketplace with only `browser-use`, `computer-use`, and `latex-tectonic`; no `imagegen` plugin/asset appeared in `/Users/robiny/.codex/.tmp/bundled-marketplaces/openai-bundled`.
+- The restart therefore supports the secondary hypothesis: once `.system/imagegen` is gone, the current bundled marketplace/runtime path does not restore it.
+
+Related upstream bug report:
+
+- GitHub issue: https://github.com/openai/codex/issues/19265
+- The issue matches this local symptom pattern: `.system`/bundled system skills can disappear after Codex App background or ephemeral execution paths.
+- Local binary string evidence in `/Applications/Codex.app/Contents/Resources/codex` contains nearby strings for `imagegen/scripts`, `.codex-system-skills.marker`, `create system skills dir`, `write system skill file`, and `remove existing system skills dir`.
+- This supports the product-bug assessment: the local mitigation is to keep using the user-level `imagegen-local` pinned copy, while the durable fix belongs in Codex App/system-skill lifecycle handling.
+
 Suggested evidence commands for the next recurrence:
 
 ```bash
