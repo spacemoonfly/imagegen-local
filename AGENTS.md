@@ -82,19 +82,22 @@ The disappearance was reproduced again on 2026-04-30 while working from:
 
 Observed state:
 
-- `/Users/robiny/.codex/skills/.system` no longer existed.
+- The previous 2026-04-29 conversation captured `/Users/robiny/.codex/skills/.system/imagegen` as present during an `ls` run at `2026-04-29T15:48:19Z` / `2026-04-29 23:48:19 +0800`.
+- That `ls` output showed a very fresh system copy: `.system/imagegen` directory mtime `Apr 29 23:44`; `.system` parent mtime `Apr 29 23:43`; `SKILL.md`, `LICENSE.txt`, `agents`, `assets`, `references`, and `scripts` mtimes `Apr 29 23:43`.
+- On the follow-up check, `/Users/robiny/.codex/skills/.system` no longer existed.
 - `/Users/robiny/.codex/skills/imagegen-local` still existed and remained clean against `origin/main`.
 - The active Codex skill list exposed `imagegen-local`, but did not expose the bundled `imagegen` skill.
 - Desktop logs for 2026-04-29 showed `image_generation` in the enabled feature list, so the built-in image-generation capability flag was still present.
 - Desktop startup logs repeatedly synchronized bundled plugins, but the bundled marketplace only listed `browser-use`, `computer-use`, and `latex-tectonic`.
-- A log line showed `installed system asset path="/Users/robiny/.codex/skills/chronicle/SKILL.md"`, but no comparable `imagegen` system asset install line was found.
+- A Desktop log line showed `installed system asset path="/Users/robiny/.codex/skills/chronicle/SKILL.md"`, but no comparable `imagegen` install log line was found in the app logs searched; the stronger `imagegen` evidence came from the conversation/session command output.
 - Searches across `~/.codex/log/codex-tui.log` and `~/Library/Logs/com.openai.codex` found no explicit `imagegen` deletion/removal event.
 
 Current assessment:
 
 - This is more likely a Codex Desktop/runtime bundled system-asset injection or marketplace composition bug than a user-level skill bug.
 - The absence of an explicit delete log means the exact remover is still unproven.
-- The strongest hypothesis is that `.system` skills are ephemeral/generated assets, and the current runtime did not repopulate `imagegen` after a cache/app restart because `imagegen` was missing from the active bundled asset source.
+- The strongest hypothesis is that `.system` skills are ephemeral/generated assets: Codex created or refreshed `.system/imagegen` around `2026-04-29 23:43 +0800`, the skill was visible/usable shortly after, and a later app/runtime refresh removed or failed to preserve the whole `.system` directory.
+- A secondary hypothesis is that the current bundled asset source no longer includes `imagegen`, so after `.system` disappeared the runtime could not repopulate it.
 - Keeping `imagegen-local` is still the correct mitigation: it survives this failure mode and avoids same-name collisions with a future restored bundled `imagegen`.
 
 Suggested evidence commands for the next recurrence:
