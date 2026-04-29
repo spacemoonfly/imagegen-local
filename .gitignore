@@ -1,0 +1,17 @@
+# Python cache and local runtime artifacts
+__pycache__/
+*.py[cod]
+.Python
+.venv/
+venv/
+.env
+
+# Editor and OS noise
+.DS_Store
+*.swp
+*.swo
+
+# Local generated outputs
+output/
+tmp/
+generated_images/
