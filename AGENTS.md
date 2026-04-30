@@ -116,6 +116,17 @@ Related upstream bug report:
 - Local binary string evidence in `/Applications/Codex.app/Contents/Resources/codex` contains nearby strings for `imagegen/scripts`, `.codex-system-skills.marker`, `create system skills dir`, `write system skill file`, and `remove existing system skills dir`.
 - This supports the product-bug assessment: the local mitigation is to keep using the user-level `imagegen-local` pinned copy, while the durable fix belongs in Codex App/system-skill lifecycle handling.
 
+Second restart/reappearance check:
+
+- After another Codex App restart, both skills were visible in the UI: system `Image Gen` and personal `Image Gen`/`imagegen-local`.
+- Filesystem confirmed `/Users/robiny/.codex/skills/.system` existed again.
+- `.system` contained `.codex-system-skills.marker`, `imagegen`, `openai-docs`, `plugin-creator`, `skill-creator`, and `skill-installer`.
+- `.system`, `.system/imagegen`, `.system/imagegen/SKILL.md`, and `.codex-system-skills.marker` all had birth/mtime/ctime `2026-04-30 15:00:23 +0800`.
+- Codex processes started at `2026-04-30 15:00:20-15:00:23 +0800`; `codex app-server --analytics-default-enabled` started at `15:00:23`, matching system skill creation.
+- Marker contents were `26df52339bf52493`.
+- App logs still only showed bundled marketplace plugins `browser-use`, `computer-use`, and `latex-tectonic`, so this `.system` creation appears to come from the Codex app-server built-in system-skill path, not the openai-bundled plugin marketplace.
+- A LaunchAgent monitor was installed at `/Users/robiny/Library/LaunchAgents/com.robiny.imagegen-system-monitor.plist` and started successfully. It runs `/Users/robiny/.codex/skills/imagegen-local/scripts/monitor_system_imagegen.sh` every 2 seconds and logs state transitions to `/Users/robiny/.codex/log/imagegen-system-monitor.log`.
+
 Suggested evidence commands for the next recurrence:
 
 ```bash
