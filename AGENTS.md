@@ -127,6 +127,17 @@ Second restart/reappearance check:
 - App logs still only showed bundled marketplace plugins `browser-use`, `computer-use`, and `latex-tectonic`, so this `.system` creation appears to come from the Codex app-server built-in system-skill path, not the openai-bundled plugin marketplace.
 - A LaunchAgent monitor was installed at `/Users/robiny/Library/LaunchAgents/com.robiny.imagegen-system-monitor.plist` and started successfully. It runs `/Users/robiny/.codex/skills/imagegen-local/scripts/monitor_system_imagegen.sh` every 2 seconds and logs state transitions to `/Users/robiny/.codex/log/imagegen-system-monitor.log`.
 
+Deletion captured by monitor:
+
+- `/Users/robiny/.codex/skills/.system` disappeared again on `2026-04-30`.
+- The monitor recorded the transition at `2026-04-30 15:10:24 +0800`.
+- The parent `/Users/robiny/.codex/skills` directory had mtime/ctime `2026-04-30 15:10:21 +0800`, so the deletion most likely occurred around `15:10:21`.
+- App log context around `2026-04-30T07:10:19Z` showed Codex home/UI refresh activity: `codex-home request`, `Skills/list request cwdsCount=7`, and `skills/list` returned successfully at `07:10:19.961Z`.
+- App log context at `2026-04-30T07:10:21.846Z` showed Chronicle starting a background summary: `starting summary session` and `starting codex exec summary session`, with `executable_path=codex`, `cwd="/var/folders/.../T/chronicle/screen_recording"`, `model=gpt-5.4`, `reasoning_effort=medium`.
+- The timing matches upstream issue #19265: background/ephemeral Chronicle `codex exec` jobs appear able to run the system-skill cleanup path and remove the shared `.system` directory.
+- Local logs did not expose the full `codex exec` argv for this run, so flags such as `--ephemeral`, `--ignore-user-config`, `--ignore-rules`, or `--config skills.bundled.enabled=false` are inferred from the upstream issue, not directly observed in this local log.
+- The monitor script was hardened after this capture: future missing-state transitions append recent Codex Desktop log lines for `Skills/list`, Chronicle, `codex exec`, system-skill lifecycle strings, plugin listing, and thread startup, so later recurrences should preserve more immediate context.
+
 Suggested evidence commands for the next recurrence:
 
 ```bash

@@ -6,6 +6,7 @@ WATCH="$ROOT/skills/.system"
 IMAGEGEN="$WATCH/imagegen"
 LOG="$ROOT/log/imagegen-system-monitor.log"
 INTERVAL="${IMAGEGEN_SYSTEM_MONITOR_INTERVAL:-2}"
+APP_LOG_ROOT="$HOME/Library/Logs/com.openai.codex"
 
 mkdir -p "$(dirname "$LOG")"
 
@@ -27,6 +28,19 @@ snapshot() {
   printf '%s | %s | pids=%s\n' "$now" "$state" "$app_pids"
 }
 
+append_app_log_context() {
+  local latest
+  latest="$(find "$APP_LOG_ROOT" -type f -name '*.log' -print 2>/dev/null | xargs ls -t 2>/dev/null | head -1 || true)"
+  if [ -z "$latest" ]; then
+    echo "--- no Codex Desktop app log found under $APP_LOG_ROOT ---"
+    return
+  fi
+
+  echo "--- recent Codex Desktop context from $latest ---"
+  /usr/bin/grep -n -E 'Skills/list|skills/list|codex-home|chronicle|summary session|codex exec|system skills|remove existing system skills|write system skill|plugin/list|thread/start' "$latest" 2>/dev/null | tail -80 || true
+  echo "--- end Codex Desktop context ---"
+}
+
 {
   echo "=== imagegen system monitor started $(date '+%Y-%m-%d %H:%M:%S %z') pid=$$ watch=$WATCH interval=${INTERVAL}s ==="
   last=""
@@ -35,6 +49,11 @@ snapshot() {
     comparable="${current#* | }"
     if [ "$comparable" != "$last" ]; then
       echo "$current"
+      case "$comparable" in
+        system-missing*|system-present-imagegen-missing*)
+          append_app_log_context
+          ;;
+      esac
       last="$comparable"
     fi
     sleep "$INTERVAL"
