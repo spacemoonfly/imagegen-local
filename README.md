@@ -73,6 +73,68 @@ unstable. For normal image generation, the skill should still prefer the built-i
 only for explicit CLI/API/model-path use cases or confirmed true transparency
 fallbacks.
 
+## HyperFrames Video Example
+
+This repo also keeps a small HyperFrames example showing how to turn the
+`imagegen-local` visual identity into a 10-second motion piece.
+
+Example output:
+
+- MP4: `assets/imagegen-local-10s.mp4`
+- Preview frame: `assets/hyperframes-preview-5s.png`
+
+Recommended workflow:
+
+```bash
+cd /path/to/workspace
+npx --yes hyperframes@0.4.39 init imagegen-local-hypervideo \
+  --example blank \
+  --non-interactive
+```
+
+Use a project-local `DESIGN.md` before writing `index.html`. For this example,
+the visual identity was derived from the README hero image: dark graphite
+canvas, cyan glow, warm gold pin highlights, `Space Grotesk` display type, and
+`IBM Plex Mono` technical labels.
+
+Copy reusable assets into the HyperFrames project:
+
+```bash
+cp ~/.codex/skills/imagegen-local/assets/imagegen.png \
+  imagegen-local-hypervideo/imagegen.png
+cp ~/.codex/skills/imagegen-local/assets/readme-hero.png \
+  imagegen-local-hypervideo/reference-hero.png
+```
+
+Validate before rendering:
+
+```bash
+cd imagegen-local-hypervideo
+npx --yes hyperframes@0.4.39 lint
+npx --yes hyperframes@0.4.39 validate
+npx --yes hyperframes@0.4.39 inspect --samples 12
+```
+
+Render a 10-second 1920x1080 MP4:
+
+```bash
+mkdir -p renders
+npx --yes hyperframes@0.4.39 render \
+  --output renders/imagegen-local-10s.mp4 \
+  --quality standard \
+  --fps 30
+ffprobe -v error -show_entries format=duration \
+  -of default=nk=1:nw=1 renders/imagegen-local-10s.mp4
+```
+
+Expected checks from the captured example:
+
+- `ffprobe` duration: `10.000000`
+- `validate`: no console errors, all text passed WCAG AA
+- `inspect --samples 12`: `0 layout issues`
+- `lint`: only `composition_file_too_large`, because the example is one
+  self-contained product-shot composition rather than split sub-compositions
+
 ## Maintenance
 
 When the upstream bundled `.system/imagegen` skill changes and you want to refresh

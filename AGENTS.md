@@ -36,6 +36,33 @@ Changes made during pinning:
 - Added `PINNED_COPY.md` to record the source and reason for the copy.
 - Verified both bundled Python helper scripts compile with `python3 -m py_compile`.
 
+## HyperFrames Example Notes
+
+On 2026-04-30, a 10-second HyperFrames video example was generated from the
+README hero/reference visual language.
+
+Assets committed for future reuse:
+
+```text
+/Users/robiny/.codex/skills/imagegen-local/assets/imagegen-local-10s.mp4
+/Users/robiny/.codex/skills/imagegen-local/assets/hyperframes-preview-5s.png
+```
+
+The working composition was created outside this repo at:
+
+```text
+/Users/robiny/3dtankdemo/imagegen-local-hypervideo
+```
+
+Practical workflow captured in `README.md`:
+
+- Use the `hyperframes:hyperframes` skill when the user asks for HTML-based video composition.
+- Create a project-local `DESIGN.md` before writing composition HTML.
+- Use a fixed CLI version for repeatability: `npx --yes hyperframes@0.4.39 ...`.
+- Validate with `lint`, `validate`, and `inspect --samples 12` before rendering.
+- Confirm final duration with `ffprobe`; the rendered example reports `10.000000` seconds.
+- A single-scene product-shot composition can trigger `composition_file_too_large`; treat that as a maintainability warning, not a render blocker, when `validate` and `inspect` are clean.
+
 ## Expected Behavior
 
 Future agents should prefer this skill when the user explicitly mentions `imagegen-local`, or when the bundled `imagegen` skill is missing from the Codex App skill library.
